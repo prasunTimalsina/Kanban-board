@@ -4,7 +4,10 @@ const modalWindowEl = document.querySelector(".modal-window");
 const modalCloseBtnEl = document.querySelector(".btn-close");
 const modalAddBtn = document.querySelector(".add-btn");
 const taskInputEl = document.getElementById("task-title");
-const tasksBoardEl = document.querySelector(".task-board");
+const boardTasksEl = document.querySelector(".task-board");
+const allboards = document.querySelectorAll(".board");
+const testTaskItem = document.querySelector(".test-task-item");
+
 ///////variables
 const state = {
   todos: {},
@@ -18,12 +21,33 @@ const addDeleteHandler = (target) => {
   });
 };
 
+const addDragHandlerOnTaskItem = (target) => {
+  target.addEventListener("dragstart", () => {
+    target.classList.add("flying");
+  });
+  target.addEventListener("dragend", () => {
+    target.classList.remove("flying");
+  });
+};
+
+const addDragHandlerOnBoard = (target) => {
+  target.addEventListener("dragover", () => {
+    const flyingItem = document.querySelector(".flying");
+    const boardTasksEl = target.querySelector(".tasks");
+    boardTasksEl.prepend(flyingItem);
+  });
+};
+
 const showModal = () => {
   modalWindowEl.style.display = "flex";
 };
 
 const hideModal = () => {
   modalWindowEl.style.display = "none";
+};
+
+const clearTaskInput = () => {
+  taskInputEl.value = "";
 };
 
 function createTaskElement(taskName, targetElement) {
@@ -89,7 +113,7 @@ function createTaskElement(taskName, targetElement) {
 
   //draggable event
   taskItem.setAttribute("draggable", true);
-
+  addDragHandlerOnTaskItem(taskItem);
   // Prepend the newly created task item into the target container
   if (targetElement && targetElement.prepend) {
     targetElement.prepend(taskItem);
@@ -98,6 +122,15 @@ function createTaskElement(taskName, targetElement) {
   }
 }
 
+const init = () => {
+  allboards.forEach((board) => {
+    addDragHandlerOnBoard(board);
+  });
+};
+
+init();
+addDragHandlerOnTaskItem(testTaskItem);
+addDeleteHandler(testTaskItem);
 ///////events
 addTaskBtnEl.addEventListener("click", () => {
   showModal();
@@ -110,8 +143,8 @@ modalCloseBtnEl.addEventListener("click", hideModal);
 modalAddBtn.addEventListener("click", () => {
   const taskTitle = taskInputEl.value;
   if (!taskTitle && taskTitle.length <= 0) return;
-  const tasksEl = tasksBoardEl.querySelector(".tasks");
+  const tasksEl = boardTasksEl.querySelector(".tasks");
   createTaskElement(taskTitle, tasksEl);
+  clearTaskInput();
   hideModal();
 });
-s;
