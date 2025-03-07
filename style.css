@@ -20,9 +20,23 @@ body {
   display: flex;
   margin: 30px;
   padding: 20px;
-  gap: 30px;
-
+  gap: 20px;
   height: 90vh;
+}
+
+/* @media (max-width: 1250px) {
+  .container {
+    flex-wrap: wrap;
+  }
+
+  .board-container {
+    flex-wrap: wrap;
+  }
+}
+ */
+.board-container {
+  display: flex;
+  gap: 30px;
 }
 
 .board {
@@ -33,6 +47,13 @@ body {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.board-delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 .tasks {
@@ -143,7 +164,7 @@ body {
 
 .modal-add-task {
   width: 300px;
-  height: 200px;
+
   background-color: #fff;
   border-radius: 20px;
   padding: 20px;
@@ -172,6 +193,25 @@ body {
   background-color: #fff;
   border-color: #3b49df;
   box-shadow: 1px 1px 0 #3b49df;
+}
+
+.select-board-label {
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+#boards-name {
+  border-radius: 5px;
+  background: rgb(249, 250, 250);
+  border: 1px solid rgb(181, 189, 196);
+  font-size: 16px;
+  height: 30px;
+  line-height: 24px;
+  padding: 7px 8px;
+  color: rgb(8, 9, 10);
+  box-shadow: none;
+  margin-top: 10px;
+  height: 35px;
 }
 
 .btn-close {
