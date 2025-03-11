@@ -1,9 +1,17 @@
 ///////elements
 const boardContainer = document.querySelector(".board-container");
 const addTaskBtnEl = document.querySelector(".add-task-btn");
+
+//modals
 const modalWindowEl = document.querySelector(".modal-window");
-const modalCloseBtnEl = document.querySelector(".btn-close");
-const modalAddBtn = document.querySelector(".add-btn");
+const modalAddTaskEl = document.querySelector(".modal-add-task");
+const addTaskCloseBtnEl = document.querySelector(".task-modal-close-btn");
+const modalAddTaskBtn = document.querySelector(".modal-add-task-btn");
+
+const modalAddBoardEl = document.querySelector(".modal-add-board");
+const modalAddBoardBtn = document.querySelector(".modal-add-board-btn");
+const modalBoardCloseBtn = document.querySelector(".board-modal-close-btn");
+/////adfadsfa
 const boardSelectEl = document.querySelector("#boards-name");
 const taskInputEl = document.getElementById("task-title");
 const boardTasksEl = document.querySelector(".tasks-board");
@@ -16,24 +24,73 @@ const state = {
   // {board,todos,taskCount}
   boards: [
     {
+      id: "aB3dE1",
       boardName: "tasks",
-      tasks: ["Learn Js"],
-      taskCount: 1,
+      tasks: [
+        {
+          id: "a345D8",
+          name: "Learn Js",
+        },
+      ],
     },
     {
-      boardName: "inProgress",
+      id: "Zx9K2m",
+      boardName: "In Progress",
       tasks: [],
-      taskCount: 0,
     },
     {
+      id: "7pQw4L",
       boardName: "done",
       tasks: [],
-      taskCount: 0,
     },
   ],
 };
+const deleteIcon = `<svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="size-6"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+      />
+    </svg>`;
 
-///////functions
+/////Functions
+const addBoard = (name) => {
+  //update state
+  const board = {};
+  const id = generateId();
+  board.id = id;
+  board.boardName = name;
+  board.tasks = [];
+  board.taskCount = 0;
+  state.boards.push(board);
+
+  //create boardEl
+  createBoardElement(board);
+};
+
+const addTask = (name, boardId) => {
+  console.log(boardId);
+  const taskId = generateId();
+  const task = {};
+  task.id = taskId;
+  task.name = name;
+  const boardIndex = state.boards.findIndex((board) => boardId === board.id);
+  state.boards[boardIndex].tasks.push(task);
+  //append task to board
+  const boardEl = document.querySelector(`[data-board-id="${boardId}"]`);
+  const taskEl = createTaskElement(task);
+  const taskContainerEl = boardEl.querySelector(".tasks");
+  taskContainerEl.prepend(taskEl);
+};
+
+///////dom related functions //////////
 const addDeleteHandler = (target) => {
   target.addEventListener("click", () => {
     const tasksEl = target.closest(".task");
@@ -44,6 +101,7 @@ const addDeleteHandler = (target) => {
 const addBoardDeleteHandler = (target) => {
   target.addEventListener("click", () => {
     const boardEl = target.closest(".board");
+
     boardEl.remove();
   });
 };
@@ -65,6 +123,12 @@ const addDragHandlerOnBoard = (target) => {
   });
 };
 
+const addTaskHandler = (target) => {
+  target.addEventListener("click", () => {
+    showModal();
+  });
+};
+
 const showModal = () => {
   modalWindowEl.style.display = "flex";
 };
@@ -77,15 +141,17 @@ const clearTaskInput = () => {
   taskInputEl.value = "";
 };
 
-function createTaskElement(taskName) {
+function createTaskElement({ name, id }) {
   // Create the <li> element with the class "task"
   const taskItem = document.createElement("li");
+
+  taskItem.setAttribute("data-task-id", id);
   taskItem.classList.add("task");
 
   // Create the <p> element for the task title
   const titleEl = document.createElement("p");
   titleEl.classList.add("task-title");
-  titleEl.textContent = taskName;
+  titleEl.textContent = name;
   taskItem.appendChild(titleEl);
 
   // Create the container for action buttons
@@ -116,22 +182,7 @@ function createTaskElement(taskName) {
   // Create the delete button with its SVG
   const deleteBtn = document.createElement("button");
   deleteBtn.classList.add("delete-btn");
-  deleteBtn.innerHTML = `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="size-6"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-      />
-    </svg>
-  `;
+  deleteBtn.innerHTML = deleteIcon;
   addDeleteHandler(deleteBtn);
   actionBtns.appendChild(deleteBtn);
 
@@ -140,6 +191,7 @@ function createTaskElement(taskName) {
 
   //draggable event
   taskItem.setAttribute("draggable", true);
+
   addDragHandlerOnTaskItem(taskItem);
   return taskItem;
 }
@@ -147,14 +199,16 @@ function createTaskElement(taskName) {
 const addBoardOption = (boardName) => {
   const newOptionEl = document.createElement("option");
   newOptionEl.value = toCamelCase(boardName);
+
   newOptionEl.textContent = toTitleCase(boardName);
   boardSelectEl.appendChild(newOptionEl);
 };
 
-const createBoardElement = () => {
-  const boardName = "Some new board";
+const createBoardElement = ({ id, boardName, tasks = null }) => {
   const className = toDashedName(boardName);
   const boardEl = document.createElement("div");
+  // add id dataAttribute
+  boardEl.setAttribute(`data-board-id`, id);
   boardEl.classList.add("board", `${className}-board`);
   const boardHeadingEl = document.createElement("h4");
   boardHeadingEl.classList.add("heading");
@@ -163,27 +217,23 @@ const createBoardElement = () => {
   tasksContainerEl.classList.add("tasks");
   const deleteBtn = document.createElement("button");
   deleteBtn.classList.add("delete-btn", "board-delete-btn");
-  deleteBtn.innerHTML = `
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke-width="1.5"
-    stroke="currentColor"
-    class="size-6"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-    />
-  </svg>
-`;
+  deleteBtn.innerHTML = deleteIcon;
   addBoardDeleteHandler(deleteBtn);
+  const addTaskBtn = document.createElement("button");
+  addTaskBtn.classList.add("add-task-btn");
+  addTaskHandler(addTaskBtn);
+  addTaskBtn.textContent = "Add Task";
+  boardEl.appendChild(addTaskBtn);
   boardEl.appendChild(boardHeadingEl);
   boardEl.appendChild(tasksContainerEl);
   boardEl.appendChild(deleteBtn);
   addDragHandlerOnBoard(boardEl);
+  if (tasks) {
+    tasks.forEach((task) => {
+      const taskEl = createTaskElement(task);
+      tasksContainerEl.prepend(taskEl);
+    });
+  }
   boardContainer.appendChild(boardEl);
   addBoardOption(boardName);
 };
@@ -192,46 +242,43 @@ const init = () => {
   allboards.forEach((board) => {
     addDragHandlerOnBoard(board);
   });
+  state.boards.forEach((board) => {
+    createBoardElement(board);
+  });
 };
 
 init();
-addDragHandlerOnTaskItem(testTaskItem);
-addDeleteHandler(testTaskItem);
-///////events
-addTaskBtnEl.addEventListener("click", () => {
-  showModal();
-});
 
 //event to close btn
-modalCloseBtnEl.addEventListener("click", hideModal);
+addTaskCloseBtnEl.addEventListener("click", () => {
+  hideModal();
+});
 
 //event to add task
-modalAddBtn.addEventListener("click", () => {
+modalAddTaskBtn.addEventListener("click", () => {
   const taskTitle = taskInputEl.value;
-
   const boardEl = document.querySelector(
     `.${camelToDash(boardSelectEl.value)}-board`
   );
-  const boardTasksEl = boardEl.querySelector(".tasks");
+  const boardId = boardEl.dataset.boardId;
+  //add task to state
   if (!taskTitle && taskTitle.length <= 0) return;
-  const tasksEl = boardTasksEl.querySelector(".tasks");
-  const taskEl = createTaskElement(taskTitle, tasksEl);
-  boardTasksEl.prepend(taskEl);
+  addTask(taskTitle, boardId);
   clearTaskInput();
-  hideModal();
+  /*  hideModal(); */
 });
 
 //event to add board
 addBoardBtn.addEventListener("click", createBoardElement);
 
-//////helper functions
+//////helper functions/////////
 function camelToDash(str) {
   return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
 function toDashedName(name) {
   // Trim any extra whitespace
-  console.log(name);
+
   name = name.trim();
 
   // Replace underscores with spaces to unify separators
@@ -266,4 +313,18 @@ function toCamelCase(str) {
     .join("");
 
   return camelCased;
+}
+
+function generateId(length = 6) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const charactersLength = characters.length;
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charactersLength);
+    result += characters.charAt(randomIndex);
+  }
+
+  return result;
 }
