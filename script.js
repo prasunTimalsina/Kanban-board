@@ -83,6 +83,7 @@ const addTask = (name, boardId) => {
   task.name = name;
   const boardIndex = state.boards.findIndex((board) => boardId === board.id);
   state.boards[boardIndex].tasks.push(task);
+  console.log(state);
   //append task to board
   const boardEl = document.querySelector(`[data-board-id="${boardId}"]`);
   const taskEl = createTaskElement(task);
@@ -91,8 +92,14 @@ const addTask = (name, boardId) => {
 };
 
 ///////dom related functions //////////
-const addDeleteHandler = (target) => {
+const addDeleteHandler = (target, taskId) => {
   target.addEventListener("click", () => {
+    //delete from state
+    state.boards.forEach((board) => {
+      board.tasks = board.tasks.filter((task) => task.id !== taskId);
+    });
+
+    console.log(state);
     const tasksEl = target.closest(".task");
     tasksEl.remove();
   });
@@ -183,7 +190,7 @@ function createTaskElement({ name, id }) {
   const deleteBtn = document.createElement("button");
   deleteBtn.classList.add("delete-btn");
   deleteBtn.innerHTML = deleteIcon;
-  addDeleteHandler(deleteBtn);
+  addDeleteHandler(deleteBtn, id);
   actionBtns.appendChild(deleteBtn);
 
   // Append the action buttons container to the task item
@@ -265,7 +272,7 @@ modalAddTaskBtn.addEventListener("click", () => {
   if (!taskTitle && taskTitle.length <= 0) return;
   addTask(taskTitle, boardId);
   clearTaskInput();
-  /*  hideModal(); */
+  hideModal();
 });
 
 //event to add board
