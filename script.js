@@ -105,35 +105,25 @@ const addTask = (name, boardId) => {
 
 ///////dom related functions //////////
 
-const addBoardDeleteHandler = (target) => {
-  target.addEventListener("click", () => {
-    const boardEl = target.closest(".board");
-
-    //deleting form state
-    const boardId = boardEl.dataset.boardId;
-    const boardIndex = state.boards.findIndex((board) => boardId === board.id);
-    console.log(`${toDashedName(state.boards[boardIndex].boardName)}-option`);
-    const optionEl = document.querySelector(
-      `.${toDashedName(state.boards[boardIndex].boardName)}-option`
-    );
-
-    state.boards.splice(boardIndex, 1);
-
-    //deleting options
-    optionEl.remove();
-    boardEl.remove();
-  });
-};
-
-const addDragHandlerOnBoard = (target) => {
-  target.addEventListener("dragover", () => {
-    const flyingItem = document.querySelector(".flying");
-    const boardTasksEl = target.querySelector(".tasks");
-    boardTasksEl.prepend(flyingItem);
-  });
-};
-
 //modal related functions
+const showAddTaskModal = () => {
+  hideAddBoardModal();
+  showModal();
+  modalAddTaskEl.style.display = "block";
+};
+const hideAddTaskModal = () => {
+  hideModal();
+  modalAddTaskEl.style.display = "none";
+};
+const showAddBoardModal = () => {
+  hideAddTaskModal();
+  showModal();
+  modalAddBoardEl.style.display = "block";
+};
+const hideAddBoardModal = () => {
+  hideModal();
+  modalAddBoardEl.style.display = "none";
+};
 const showModal = () => {
   modalWindowEl.style.display = "flex";
 };
@@ -160,11 +150,13 @@ const addDeleteHandler = (target, taskId) => {
     tasksEl.remove();
   });
 };
+
 const addTaskHandler = (target) => {
   target.addEventListener("click", () => {
-    showModal();
+    showAddTaskModal();
   });
 };
+
 const addDragHandlerOnTaskItem = (target) => {
   target.addEventListener("dragstart", () => {
     target.classList.add("flying");
@@ -173,6 +165,7 @@ const addDragHandlerOnTaskItem = (target) => {
     target.classList.remove("flying");
   });
 };
+
 function createTaskElement({ name, id }) {
   // Create the <li> element with the class "task"
   const taskItem = document.createElement("li");
@@ -229,6 +222,34 @@ function createTaskElement({ name, id }) {
 }
 
 ////board related functions
+const addBoardDeleteHandler = (target) => {
+  target.addEventListener("click", () => {
+    const boardEl = target.closest(".board");
+
+    //deleting form state
+    const boardId = boardEl.dataset.boardId;
+    const boardIndex = state.boards.findIndex((board) => boardId === board.id);
+    console.log(`${toDashedName(state.boards[boardIndex].boardName)}-option`);
+    const optionEl = document.querySelector(
+      `.${toDashedName(state.boards[boardIndex].boardName)}-option`
+    );
+
+    state.boards.splice(boardIndex, 1);
+
+    //deleting options
+    optionEl.remove();
+    boardEl.remove();
+  });
+};
+
+const addDragHandlerOnBoard = (target) => {
+  target.addEventListener("dragover", () => {
+    const flyingItem = document.querySelector(".flying");
+    const boardTasksEl = target.querySelector(".tasks");
+    boardTasksEl.prepend(flyingItem);
+  });
+};
+
 const addBoardOption = (boardName) => {
   const newOptionEl = document.createElement("option");
   const className = toDashedName(boardName);
@@ -287,7 +308,7 @@ init();
 
 //event to close btn
 addTaskCloseBtnEl.addEventListener("click", () => {
-  hideModal();
+  hideAddTaskModal();
 });
 
 //event to add task
@@ -306,7 +327,20 @@ modalAddTaskBtn.addEventListener("click", () => {
 
 //event to add board
 addBoardBtn.addEventListener("click", () => {
-  addBoard();
+  showAddBoardModal();
+});
+
+modalBoardCloseBtn.addEventListener("click", () => {
+  hideAddBoardModal();
+});
+
+modalAddBoardBtn.addEventListener("click", () => {
+  const nameInputEl = document.querySelector("#board-name");
+  const boardName = nameInputEl.value;
+  if (!boardName && boardName.length <= 0) return;
+  addBoard(boardName);
+  nameInputEl.value = "";
+  hideAddBoardModal();
 });
 
 //////helper functions/////////
