@@ -85,6 +85,7 @@ const addBoard = (name = "Some board") => {
   console.log(board);
   //create boardEl
   createBoardElement(board);
+  persistState();
 };
 
 const addTask = (name, boardId) => {
@@ -102,6 +103,7 @@ const addTask = (name, boardId) => {
   const taskContainerEl = boardEl.querySelector(".tasks");
   taskContainerEl.prepend(taskEl);
   updateTaskCount();
+  persistState();
 };
 
 function retrieveAndRemoveTask(data, taskId) {
@@ -119,6 +121,10 @@ function retrieveAndRemoveTask(data, taskId) {
   }
   return null; // Task not found
 }
+
+const persistState = () => {
+  localStorage.setItem("boards", JSON.stringify(state.boards));
+};
 
 ///////dom related functions //////////
 
@@ -165,6 +171,8 @@ const addDeleteHandler = (target, taskId) => {
     console.log(state);
     const tasksEl = target.closest(".task");
     tasksEl.remove();
+    updateTaskCount();
+    persistState();
   });
 };
 
@@ -193,6 +201,7 @@ const addDragHandlerOnTaskItem = (target) => {
       console.log(board);
       console.log(state.boards);
       updateTaskCount();
+      persistState();
     }
   });
 };
@@ -281,6 +290,9 @@ const addBoardDeleteHandler = (target) => {
     //deleting options
     optionEl.remove();
     boardEl.remove();
+
+    //persist state
+    persistState();
   });
 };
 
@@ -343,6 +355,10 @@ const createBoardElement = ({ id, boardName, tasks = null }) => {
 };
 
 const init = () => {
+  //get states
+  const boardsString = localStorage.getItem("boards");
+  console.log(boardsString);
+  if (boardsString) state.boards = JSON.parse(boardsString);
   allboards.forEach((board) => {
     addDragHandlerOnBoard(board);
   });
