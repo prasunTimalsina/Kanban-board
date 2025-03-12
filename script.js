@@ -107,10 +107,8 @@ const addTask = (name, boardId) => {
 };
 
 function retrieveAndRemoveTask(data, taskId) {
-  console.log(data, taskId);
   for (const board of data) {
     const taskIndex = board.tasks.findIndex((task) => {
-      console.log(taskId, task.id);
       return taskId === task.id;
     });
 
@@ -198,8 +196,6 @@ const addDragHandlerOnTaskItem = (target) => {
       const boardId = boardEl.dataset.boardId;
       const [board] = state.boards.filter((board) => board.id === boardId);
       board.tasks.push(flyingTaskObj);
-      console.log(board);
-      console.log(state.boards);
       updateTaskCount();
       persistState();
     }
@@ -309,7 +305,6 @@ const addBoardOption = (boardName) => {
   const newOptionEl = document.createElement("option");
   const className = toDashedName(boardName);
   newOptionEl.classList.add(`${className}-option`);
-  console.log(`${className}-option`);
   newOptionEl.value = toCamelCase(boardName);
 
   newOptionEl.textContent = toTitleCase(boardName);
@@ -357,7 +352,6 @@ const createBoardElement = ({ id, boardName, tasks = null }) => {
 const init = () => {
   //get states
   const boardsString = localStorage.getItem("boards");
-  console.log(boardsString);
   if (boardsString) state.boards = JSON.parse(boardsString);
   allboards.forEach((board) => {
     addDragHandlerOnBoard(board);
@@ -366,9 +360,9 @@ const init = () => {
     createBoardElement(board);
   });
 };
-
+/////////////////////Initialization////////////////////////////
 init();
-
+///////////////////////////////////////////////////////////////
 //event to close btn
 addTaskCloseBtnEl.addEventListener("click", () => {
   hideAddTaskModal();
