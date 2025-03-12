@@ -101,6 +101,7 @@ const addTask = (name, boardId) => {
   const taskEl = createTaskElement(task);
   const taskContainerEl = boardEl.querySelector(".tasks");
   taskContainerEl.prepend(taskEl);
+  updateTaskCount();
 };
 
 function retrieveAndRemoveTask(data, taskId) {
@@ -191,6 +192,7 @@ const addDragHandlerOnTaskItem = (target) => {
       board.tasks.push(flyingTaskObj);
       console.log(board);
       console.log(state.boards);
+      updateTaskCount();
     }
   });
 };
@@ -250,6 +252,17 @@ function createTaskElement({ name, id }) {
   return taskItem;
 }
 
+const updateTaskCount = () => {
+  const allboards = document.querySelectorAll(".board");
+
+  allboards.forEach((board) => {
+    const allTaskEl = Array.from(board.querySelectorAll(".task"));
+
+    const taskCountEl = board.querySelector(".task-count");
+    taskCountEl.textContent = `(${allTaskEl.length})`;
+  });
+};
+
 ////board related functions
 const addBoardDeleteHandler = (target) => {
   target.addEventListener("click", () => {
@@ -276,6 +289,7 @@ const addDragHandlerOnBoard = (target) => {
     const flyingItem = document.querySelector(".flying");
     const boardTasksEl = target.querySelector(".tasks");
     boardTasksEl.prepend(flyingItem);
+    updateTaskCount();
   });
 };
 
@@ -299,6 +313,10 @@ const createBoardElement = ({ id, boardName, tasks = null }) => {
   const boardHeadingEl = document.createElement("h4");
   boardHeadingEl.classList.add("heading");
   boardHeadingEl.textContent = toTitleCase(boardName);
+  const taskCountEl = document.createElement("span");
+  taskCountEl.classList.add("task-count");
+  taskCountEl.textContent = `(${tasks.length})`;
+  boardHeadingEl.appendChild(taskCountEl);
   const tasksContainerEl = document.createElement("div");
   tasksContainerEl.classList.add("tasks");
   const deleteBtn = document.createElement("button");
