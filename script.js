@@ -103,6 +103,22 @@ const addTask = (name, boardId) => {
   taskContainerEl.prepend(taskEl);
 };
 
+function retrieveAndRemoveTask(data, taskId) {
+  console.log(data, taskId);
+  for (const board of data) {
+    const taskIndex = board.tasks.findIndex((task) => {
+      console.log(taskId, task.id);
+      return taskId === task.id;
+    });
+
+    if (taskIndex !== -1) {
+      const [removedTask] = board.tasks.splice(taskIndex, 1);
+      return removedTask;
+    }
+  }
+  return null; // Task not found
+}
+
 ///////dom related functions //////////
 
 //modal related functions
@@ -163,6 +179,19 @@ const addDragHandlerOnTaskItem = (target) => {
   });
   target.addEventListener("dragend", () => {
     target.classList.remove("flying");
+    ///fly in data structures also
+    const flyingtaskId = target.dataset.taskId;
+    //delete from current board
+    const flyingTaskObj = retrieveAndRemoveTask(state.boards, flyingtaskId);
+
+    if (flyingTaskObj) {
+      const boardEl = target.closest(".board");
+      const boardId = boardEl.dataset.boardId;
+      const [board] = state.boards.filter((board) => board.id === boardId);
+      board.tasks.push(flyingTaskObj);
+      console.log(board);
+      console.log(state.boards);
+    }
   });
 };
 

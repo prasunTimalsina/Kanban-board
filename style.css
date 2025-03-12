@@ -36,6 +36,7 @@ body {
  */
 .board-container {
   display: flex;
+  flex-wrap: wrap;
   gap: 30px;
 }
 
@@ -150,6 +151,7 @@ body {
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  order: 99999999;
 }
 
 .modal-window {
