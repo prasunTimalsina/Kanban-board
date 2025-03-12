@@ -61,16 +61,28 @@ const deleteIcon = `<svg
     </svg>`;
 
 /////Functions
-const addBoard = (name) => {
+const validateBoard = (boardName) => {
+  const board = state.boards.filter((board) => boardName === board.boardName);
+  if (board.length > 0) return false;
+  else return true;
+};
+
+const addBoard = (name = "Some board") => {
+  //check if there is board with same name;
+  if (!validateBoard(name)) {
+    alert("Give different name of board");
+    return;
+  }
   //update state
   const board = {};
   const id = generateId();
   board.id = id;
+  console.log(name);
   board.boardName = name;
   board.tasks = [];
-  board.taskCount = 0;
-  state.boards.push(board);
 
+  state.boards.push(board);
+  console.log(board);
   //create boardEl
   createBoardElement(board);
 };
@@ -92,33 +104,24 @@ const addTask = (name, boardId) => {
 };
 
 ///////dom related functions //////////
-const addDeleteHandler = (target, taskId) => {
-  target.addEventListener("click", () => {
-    //delete from state
-    state.boards.forEach((board) => {
-      board.tasks = board.tasks.filter((task) => task.id !== taskId);
-    });
-
-    console.log(state);
-    const tasksEl = target.closest(".task");
-    tasksEl.remove();
-  });
-};
 
 const addBoardDeleteHandler = (target) => {
   target.addEventListener("click", () => {
     const boardEl = target.closest(".board");
 
-    boardEl.remove();
-  });
-};
+    //deleting form state
+    const boardId = boardEl.dataset.boardId;
+    const boardIndex = state.boards.findIndex((board) => boardId === board.id);
+    console.log(`${toDashedName(state.boards[boardIndex].boardName)}-option`);
+    const optionEl = document.querySelector(
+      `.${toDashedName(state.boards[boardIndex].boardName)}-option`
+    );
 
-const addDragHandlerOnTaskItem = (target) => {
-  target.addEventListener("dragstart", () => {
-    target.classList.add("flying");
-  });
-  target.addEventListener("dragend", () => {
-    target.classList.remove("flying");
+    state.boards.splice(boardIndex, 1);
+
+    //deleting options
+    optionEl.remove();
+    boardEl.remove();
   });
 };
 
@@ -130,12 +133,7 @@ const addDragHandlerOnBoard = (target) => {
   });
 };
 
-const addTaskHandler = (target) => {
-  target.addEventListener("click", () => {
-    showModal();
-  });
-};
-
+//modal related functions
 const showModal = () => {
   modalWindowEl.style.display = "flex";
 };
@@ -148,6 +146,33 @@ const clearTaskInput = () => {
   taskInputEl.value = "";
 };
 
+////task related functions
+//task delete
+const addDeleteHandler = (target, taskId) => {
+  target.addEventListener("click", () => {
+    //delete from state
+    state.boards.forEach((board) => {
+      board.tasks = board.tasks.filter((task) => task.id !== taskId);
+    });
+
+    console.log(state);
+    const tasksEl = target.closest(".task");
+    tasksEl.remove();
+  });
+};
+const addTaskHandler = (target) => {
+  target.addEventListener("click", () => {
+    showModal();
+  });
+};
+const addDragHandlerOnTaskItem = (target) => {
+  target.addEventListener("dragstart", () => {
+    target.classList.add("flying");
+  });
+  target.addEventListener("dragend", () => {
+    target.classList.remove("flying");
+  });
+};
 function createTaskElement({ name, id }) {
   // Create the <li> element with the class "task"
   const taskItem = document.createElement("li");
@@ -203,8 +228,12 @@ function createTaskElement({ name, id }) {
   return taskItem;
 }
 
+////board related functions
 const addBoardOption = (boardName) => {
   const newOptionEl = document.createElement("option");
+  const className = toDashedName(boardName);
+  newOptionEl.classList.add(`${className}-option`);
+  console.log(`${className}-option`);
   newOptionEl.value = toCamelCase(boardName);
 
   newOptionEl.textContent = toTitleCase(boardName);
@@ -225,6 +254,7 @@ const createBoardElement = ({ id, boardName, tasks = null }) => {
   const deleteBtn = document.createElement("button");
   deleteBtn.classList.add("delete-btn", "board-delete-btn");
   deleteBtn.innerHTML = deleteIcon;
+  addBoardOption(boardName);
   addBoardDeleteHandler(deleteBtn);
   const addTaskBtn = document.createElement("button");
   addTaskBtn.classList.add("add-task-btn");
@@ -242,7 +272,6 @@ const createBoardElement = ({ id, boardName, tasks = null }) => {
     });
   }
   boardContainer.appendChild(boardEl);
-  addBoardOption(boardName);
 };
 
 const init = () => {
@@ -276,7 +305,9 @@ modalAddTaskBtn.addEventListener("click", () => {
 });
 
 //event to add board
-addBoardBtn.addEventListener("click", createBoardElement);
+addBoardBtn.addEventListener("click", () => {
+  addBoard();
+});
 
 //////helper functions/////////
 function camelToDash(str) {
